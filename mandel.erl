@@ -10,24 +10,41 @@ small(X,Y,X1) ->
     K = (X1 -X)/Width, 
     Depth = 64,
     T0 = now(),
-    Image = mandelbrot(Width, Height, X, Y, K,Depth),
+    Image1 = mandelbrot(Width, {Height div 2 + 1, Height}, X, Y, K,Depth),
+    Image1 = mandelbrot(Width, {0, Height div 2}, X, Y, K,Depth),
     T = timer:now_diff(now(), T0),
     io:format("picture generated in ~w ms~n", [T div 1000]),
     ppm:write("small.ppm", Image). 
 
 
-mandelbrot(Width, Height, X, Y, K, Depth) ->
+mandelbrot(Width, {Start, Height}, X, Y, K, Depth) ->
     Trans = fun(W, H) ->
             cmplx:new(X + K*(W-1), Y-K*(H-1))
     end,
-    rows(Width, Height, Trans, Depth, []). 
+    spawn(fun() -> init(self(), {Width, {Height div 2, Height}, Trans, Depth, []}) end),
+    io:format("Dun", []),
+    receive
+        Rows ->
+            io:format("Checkpoint", [])
+    end,
+    Rows.
 
-rows(_,0,_,_,Acc) ->
+init(Pid, Settings) ->
+    initThread(Pid, Settings).
+
+
+initThread(Pid, {Width, Height, Trans, Depth, Acc}) ->
+    Pid ! rows(Width, Height, Trans, Depth, Acc),
+    io:format("Rows Done", []),
+    ok.
+
+
+rows(_,{End, Height},_,_,Acc) when End == Height ->
     Acc;
 
-rows(Width, Height, Trans, Depth, Acc) ->
+rows(Width, {End, Height}, Trans, Depth, Acc) ->
     Col = column(Width, Height, Trans, Depth, []), 
-    rows(Width, Height-1, Trans, Depth, [Col|Acc]).
+    rows(Width, {End, Height-1}, Trans, Depth, [Col|Acc]).
 
 column(0, _, _, _, Acc) ->
     Acc;
