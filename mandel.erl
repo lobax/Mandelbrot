@@ -10,14 +10,18 @@ small(X,Y,X1) ->
     K = (X1 -X)/Width, 
     Depth = 64,
     T0 = now(),
-    mandelbrot(self(), Width div 2, {Height div 2 + 1, Height}, X, Y, K,Depth),
+    mandelbrot(self(), Width, {Height div 2 + 1, Height}, X, Y, K,Depth),
+    mandelbrot(self(), Width, {0, Height div 2}, X, Y, K,Depth),
     receive 
-        {done, Rows} ->
-            io:format("Rows Done ~n ", [])
+        {done, First } ->
+            receive
+                {done, Second} ->
+                    Image = First ++ Second
+            end
     end,
     T = timer:now_diff(now(), T0),
     io:format("picture generated in ~w ms~n", [T div 1000]),
-    ppm:write("small.ppm", [Rows]). 
+    ppm:write("small.ppm", Image). 
 
 
 mandelbrot(Pid, Width, {Start, Height}, X, Y, K, Depth) ->
