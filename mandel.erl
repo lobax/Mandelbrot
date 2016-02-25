@@ -10,8 +10,7 @@ small(X,Y,X1) ->
     K = (X1 -X)/Width, 
     Depth = 64,
     T0 = now(),
-    Image1 = mandelbrot(Width, {Height div 2 + 1, Height}, X, Y, K,Depth),
-    Image1 = mandelbrot(Width, {0, Height div 2}, X, Y, K,Depth),
+    Image = mandelbrot(Width, Height, X, Y, K,Depth),
     T = timer:now_diff(now(), T0),
     io:format("picture generated in ~w ms~n", [T div 1000]),
     ppm:write("small.ppm", Image). 
