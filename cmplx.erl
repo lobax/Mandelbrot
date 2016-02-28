@@ -1,15 +1,17 @@
--module(cmplx). 
--export([new/2,add/2,sqr/1,abs/1]). 
+-module(cmplx).
+
+-export([new/2,add/2, sqr/1, abs/1]).
+
 
 new(X, Y) ->
-    {X, Y}. 
+    {X, Y}.
 
-add({Ar, Ai}, {Br, Bi}) ->
-    {Ar + Br, Ai + Bi}. 
+add({X1,Y1}, {X2,Y2}) ->
+    {X1+X2, Y1+Y2}.
 
-sqr({R, I}) ->
-    {R*R - I*I, 2*R*I}. 
+sqr({X,Y}) ->
+    {X*X - Y*Y, 2*X*Y}.
 
-abs({R,I}) ->
-    math:sqrt(I*I + R*R). 
+abs({X,Y}) ->
+    math:sqrt(X*X+Y*Y).
 
