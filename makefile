@@ -1,14 +1,21 @@
-ERLC=erlc
-ERLCFLAGS=-o
-SRCDIR=src
-BEAMDIR=./ebin
+erlfiles=$(wildcard src/*.erl)
+beamfiles=$(patsubst src/%.erl, ebin/%.beam,$(erlfiles))
 
+ebin/%.beam: src/%.erl
+	@mkdir -p ebin
+	@erlc -o ebin $<
 
-.PHONY: all clean
+all: $(beamfiles)
 
-all:
-	@mkdir -p $(BEAMDIR) ;
-	@$(ERLC) $(ERLCFLAGS) $(BEAMDIR) $(SRCDIR)/*.erl ;
+.PHONY: clean run
 
 clean: 
-	@rm -rf $(BEAMDIR) ;
+	@rm -rf ebin
+	@rm small.png
+
+run: $(beamfiles) 
+	@ cd ebin; \
+	erl -noshell -s mandel demo -init stop
+	@mv ebin/small.ppm small.ppm
+	@convert small.ppm small.png
+	@rm small.ppm

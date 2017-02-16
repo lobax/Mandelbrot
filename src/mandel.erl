@@ -2,7 +2,8 @@
 -export([mandelbrot/6, demo/0]). 
 
 demo() ->
-    small(-2.6,1.2,1.6). 
+    small(-2.6,1.2,1.6), 
+    init:stop(). 
 
 small(X,Y,X1) ->
     Width = 960,
